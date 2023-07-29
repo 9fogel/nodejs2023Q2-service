@@ -20,3 +20,10 @@ export interface ITrack {
   albumId: string | null; // refers to Album
   duration: number; // integer number
 }
+
+export interface IAlbum {
+  id: string; // uuid v4
+  name: string;
+  year: number;
+  artistId: string | null; // refers to Artist
+}
