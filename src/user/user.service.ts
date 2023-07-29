@@ -23,7 +23,7 @@ export class UserService {
       updatedAt: Date.now(),
     };
 
-    this.db.users.push(newUser);
+    this.db.addElement('users', newUser);
 
     const newUserResponse = this.hidePasswordUser(newUser);
 
@@ -31,7 +31,9 @@ export class UserService {
   }
 
   findAll() {
-    return this.db.users.map((user) => this.hidePasswordUser(user));
+    return this.db
+      .findMany('users')
+      .map((user: IUser) => this.hidePasswordUser(user));
   }
 
   findOne(id: string) {
@@ -39,15 +41,15 @@ export class UserService {
 
     if (!isIdValid) {
       throw new BadRequestException(
-        `Sorry, userId ${id} is invalid (not uuid)`,
+        `Sorry, user ID ${id} is invalid (not uuid)`,
       );
     }
 
-    const foundUser = this.db.users.find((user) => user.id === id);
+    const foundUser = this.db.findFirst('users', id);
     if (foundUser) {
       return this.hidePasswordUser(foundUser);
     } else {
-      throw new NotFoundException(`Sorry, user with id ${id} not found`);
+      throw new NotFoundException(`Sorry, user with ID ${id} not found`);
     }
   }
 
@@ -56,13 +58,13 @@ export class UserService {
 
     if (!isIdValid) {
       throw new BadRequestException(
-        `Sorry, userId ${id} is invalid (not uuid)`,
+        `Sorry, user ID ${id} is invalid (not uuid)`,
       );
     }
 
-    const userToUpdate = this.db.users.find((user) => user.id === id);
+    const userToUpdate = this.db.findFirst('users', id);
     if (!userToUpdate) {
-      throw new NotFoundException(`Sorry, user with id ${id} not found`);
+      throw new NotFoundException(`Sorry, user with ID ${id} not found`);
     }
 
     const { oldPassword, newPassword } = updateUserDto;
@@ -83,17 +85,16 @@ export class UserService {
 
     if (!isIdValid) {
       throw new BadRequestException(
-        `Sorry, userId ${id} is invalid (not uuid)`,
+        `Sorry, user ID ${id} is invalid (not uuid)`,
       );
     }
 
-    const userToDelete = this.db.users.find((user) => user.id === id);
+    const userToDelete = this.db.findFirst('users', id);
     if (userToDelete) {
-      const userIndexToDelete = this.db.users.indexOf(userToDelete);
-      this.db.users.splice(userIndexToDelete, 1);
-      return `User with id #${id} was removed`;
+      this.db.deleteElement('users', userToDelete);
+      return `User with ID #${id} was removed`;
     } else {
-      throw new NotFoundException(`Sorry, user with id ${id} not found`);
+      throw new NotFoundException(`Sorry, user with ID ${id} not found`);
     }
   }
 
