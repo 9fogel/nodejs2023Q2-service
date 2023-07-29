@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IArtist, IUser } from 'src/models/interfaces';
+import { IArtist, ITrack, IUser } from 'src/models/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -23,11 +23,21 @@ export class DatabaseService {
     },
   ];
 
-  addElement(entity: string, element: IUser | IArtist) {
+  tracks: Array<ITrack> = [
+    {
+      id: uuidv4(),
+      name: 'Bring Me To Life',
+      artistId: this.artists[0].id,
+      albumId: null,
+      duration: 3,
+    },
+  ];
+
+  addElement(entity: string, element: IUser | IArtist | ITrack) {
     this[entity].push(element);
   }
 
-  deleteElement(entity: string, element: IUser | IArtist) {
+  deleteElement(entity: string, element: IUser | IArtist | ITrack) {
     //TODO: should set track.artistId to null after ARTIST deletion
     //TODO: should set album.artistId to null after ARTIST deletion
     const elemIndexToDelete = this[entity].indexOf(element);
