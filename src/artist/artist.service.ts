@@ -21,12 +21,10 @@ export class ArtistService {
     this.db.addElement('artists', newArtist);
 
     return newArtist;
-    // return 'This action adds a new artist';
   }
 
   findAll() {
     return this.db.findMany('artists');
-    // return `This action returns all artist`;
   }
 
   findOne(id: string) {
@@ -44,8 +42,6 @@ export class ArtistService {
     } else {
       throw new NotFoundException(`Sorry, artist with ID ${id} not found`);
     }
-
-    // return `This action returns a #${id} artist`;
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
@@ -67,7 +63,6 @@ export class ArtistService {
     artistToUpdate.grammy = grammy;
 
     return artistToUpdate;
-    // return `This action updates a #${id} artist`;
   }
 
   remove(id: string) {
