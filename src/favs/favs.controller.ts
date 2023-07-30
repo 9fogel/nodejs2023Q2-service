@@ -8,7 +8,8 @@ export class FavsController {
   @Post(':entity/:id')
   create(@Param('entity') entity: string, @Param('id') id: string) {
     this.favsService.create(entity, id);
-    return { id };
+    return `${entity.toUpperCase()} with ID ${id} was added to favorites`;
+    // return { id };
   }
 
   @Get()
