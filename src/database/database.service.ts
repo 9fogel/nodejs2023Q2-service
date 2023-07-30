@@ -113,34 +113,16 @@ export class DatabaseService {
 
   findMany(entity: string) {
     if (entity === 'favs') {
-      const response = {
-        artists: this.favs.artists
-          .map((id) => {
-            return this.artists.filter((artist) => artist.id === id);
-          })
-          .flat(),
-        albums: this.favs.albums
-          .map((id) => {
-            return this.albums.filter((album) => album.id === id);
-          })
-          .flat(),
-        tracks: this.favs.tracks
-          .map((id) => {
-            return this.tracks.filter((track) => track.id === id);
-          })
-          .flat(),
-      };
-
-      // const response = {};
-      // for (const key in this.favs) {
-      //   response[key] = this.favs[key]
-      //     .map((id: string) =>
-      //       this[key].filter(
-      //         (elem: IUser | IArtist | ITrack | IAlbum) => elem.id === id,
-      //       ),
-      //     )
-      //     .flat();
-      // }
+      const response = {};
+      for (const key in this.favs) {
+        response[key] = this.favs[key]
+          .map((id: string) =>
+            this[key].filter(
+              (elem: IUser | IArtist | ITrack | IAlbum) => elem.id === id,
+            ),
+          )
+          .flat();
+      }
 
       return response;
     }
