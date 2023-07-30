@@ -3,7 +3,6 @@ import {
   IAlbum,
   IArtist,
   IFavorites,
-  IFavoritesResponse,
   ITrack,
   IUser,
 } from 'src/models/interfaces';
@@ -14,7 +13,7 @@ export class DatabaseService {
   users: Array<IUser> = [
     {
       id: uuidv4(),
-      login: '9fogel',
+      login: 'user',
       password: 'password',
       version: 1,
       createdAt: Date.now(),
