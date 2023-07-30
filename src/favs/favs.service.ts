@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFavDto } from './dto/create-fav.dto';
-import { UpdateFavDto } from './dto/update-fav.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { DatabaseService } from 'src/database/database.service';
+import { validate as uuidValidate } from 'uuid';
 
 @Injectable()
 export class FavsService {
-  create(createFavDto: CreateFavDto) {
-    return 'This action adds a new fav';
+  constructor(private db: DatabaseService) {}
+
+  create(entity: string, id: string) {
+    const isIdValid = uuidValidate(id);
+
+    if (!isIdValid) {
+      throw new BadRequestException(
+        `Sorry, ${entity} ID ${id} is invalid (not uuid)`,
+      );
+    }
+
+    const key = entity + 's';
+    if (this.db.existsInDatabase(key, id)) {
+      return this.db.addToFavs(key, id);
+    } else {
+      throw new UnprocessableEntityException(
+        `Sorry, ${entity} with ID ${id} doesn't exist in Database`,
+      );
+    }
   }
 
   findAll() {
-    return `This action returns all favs`;
+    return this.db.findMany('favs');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} fav`;
-  }
+  remove(entity: string, id: string) {
+    const isIdValid = uuidValidate(id);
 
-  update(id: number, updateFavDto: UpdateFavDto) {
-    return `This action updates a #${id} fav`;
-  }
+    if (!isIdValid) {
+      throw new BadRequestException(
+        `Sorry, ${entity} ID ${id} is invalid (not uuid)`,
+      );
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} fav`;
+    const key = entity + 's';
+    if (this.db.existsInFavorites(key, id)) {
+      this.db.removeFromFavs(key, id);
+      return `${key.toUpperCase()} with ID ${id} was removed from Favorites`;
+    } else {
+      throw new NotFoundException(
+        `Sorry, ${entity} with ID ${id} not found in Favorites`,
+      );
+    }
   }
 }

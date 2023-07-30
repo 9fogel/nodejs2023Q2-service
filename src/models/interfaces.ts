@@ -27,3 +27,15 @@ export interface IAlbum {
   year: number;
   artistId: string | null; // refers to Artist
 }
+
+export interface IFavorites {
+  artists: Array<string>;
+  albums: Array<string>;
+  tracks: Array<string>;
+}
+
+export interface IFavoritesResponse {
+  artists: Array<IArtist>;
+  albums: Array<IAlbum>;
+  tracks: Array<ITrack>;
+}

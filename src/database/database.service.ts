@@ -1,5 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { IAlbum, IArtist, ITrack, IUser } from 'src/models/interfaces';
+import {
+  IAlbum,
+  IArtist,
+  IFavorites,
+  IFavoritesResponse,
+  ITrack,
+  IUser,
+} from 'src/models/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -42,8 +49,20 @@ export class DatabaseService {
     },
   ];
 
+  favs: IFavorites = {
+    artists: [this.artists[0].id],
+    albums: [this.albums[0].id],
+    tracks: [this.tracks[0].id],
+  };
+
   addElement(entity: string, element: IUser | IArtist | ITrack | IAlbum) {
     this[entity].push(element);
+  }
+
+  addToFavs(entity: string, id: string) {
+    if (!this.favs[entity].includes(id)) {
+      this.favs[entity].push(id);
+    }
   }
 
   deleteElement(entity: string, element: IUser | IArtist | ITrack | IAlbum) {
@@ -65,6 +84,25 @@ export class DatabaseService {
         .filter((track) => track.albumId === id)
         .forEach((track) => (track.albumId = null));
     }
+
+    if (
+      (entity === 'artists' || entity === 'albums' || entity === 'tracks') &&
+      this.existsInDatabase(entity, id)
+    ) {
+      this.removeFromFavs(entity, id);
+    }
+  }
+
+  existsInDatabase(entity: string, id: string) {
+    const doesExist = this[entity].some(
+      (elem: IUser | IArtist | ITrack | IAlbum) => elem.id === id,
+    );
+    return doesExist;
+  }
+
+  existsInFavorites(entity: string, id: string) {
+    const doesExist = this.favs[entity].includes(id);
+    return doesExist;
   }
 
   findFirst(entity: string, id: string) {
@@ -74,6 +112,43 @@ export class DatabaseService {
   }
 
   findMany(entity: string) {
+    if (entity === 'favs') {
+      const response = {
+        artists: this.favs.artists
+          .map((id) => {
+            return this.artists.filter((artist) => artist.id === id);
+          })
+          .flat(),
+        albums: this.favs.albums
+          .map((id) => {
+            return this.albums.filter((album) => album.id === id);
+          })
+          .flat(),
+        tracks: this.favs.tracks
+          .map((id) => {
+            return this.tracks.filter((track) => track.id === id);
+          })
+          .flat(),
+      };
+
+      // const response = {};
+      // for (const key in this.favs) {
+      //   response[key] = this.favs[key]
+      //     .map((id: string) =>
+      //       this[key].filter(
+      //         (elem: IUser | IArtist | ITrack | IAlbum) => elem.id === id,
+      //       ),
+      //     )
+      //     .flat();
+      // }
+
+      return response;
+    }
     return this[entity];
+  }
+
+  removeFromFavs(entity: string, id: string) {
+    const idIndexToDelete = this.favs[entity].indexOf(id);
+    this.favs[entity].splice(idIndexToDelete, 1);
   }
 }
