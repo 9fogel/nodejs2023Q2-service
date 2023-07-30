@@ -81,7 +81,7 @@ export class TrackService {
       this.db.deleteElement('tracks', trackToDelete);
       return `Track with ID #${id} was removed`;
     } else {
-      throw new NotFoundException(`Sorry, Track with ID ${id} not found`);
+      throw new NotFoundException(`Sorry, track with ID ${id} not found`);
     }
   }
 }
