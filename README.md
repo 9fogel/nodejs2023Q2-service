@@ -15,7 +15,12 @@ App served at http://localhost:4000
 
 Port value is stored in `.env` file
 
-Please note: The database already has some default values at start
+_After starting the app on port (4000 as default) you can open
+in your browser OpenAPI documentation by typing http://localhost:4000/doc/._
+
+For more information about OpenAPI/Swagger please visit https://swagger.io/.
+
+**Please note:** The database already has some default values at start
 
 ## Endpoints
 The following endpoints are available:
