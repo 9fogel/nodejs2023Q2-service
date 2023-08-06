@@ -2,19 +2,31 @@ version: '3'
 services:
   node:
     build: .
-    env_file:
-      .env
+    restart: always
     ports:
       - ${PORT}:${PORT}
     depends_on:
       - postgres
     environment:
       - PORT=${PORT}
+    env_file:
+      .env
+    networks:
+      - my-network
   postgres:
     build: ./src/database
+    restart: always
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      .env
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
