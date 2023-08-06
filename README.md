@@ -1,31 +1,37 @@
 # Home Library Service
 
 ## Prerequisites
-
-- Git - [Download & Install Git](https://git-scm.com/downloads).
-- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
-
-## Downloading
-
-```
-git clone {repository URL}
-```
-
-## Installing NPM modules
-
-```
-npm install
-```
+1. Install [Node.js](https://nodejs.org/en/download/), [Git](https://git-scm.com/downloads).
+2. Clone this repository: https://github.com/9fogel/nodejs2023Q2-service.git
+3. Switch to `develop` branch
+4. To install all dependencies use [`npm install`](https://docs.npmjs.com/cli/install)
 
 ## Running application
 
 ```
 npm start
 ```
+App served at http://localhost:4000
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
+Port value is stored in `.env` file
+
+_After starting the app on port (4000 as default) you can open
+in your browser OpenAPI documentation by typing http://localhost:4000/doc/._
+
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
+
+**Please note:** The database already has some default values at start
+
+## Endpoints
+The following endpoints are available:
+```
+http://localhost:4000/user
+http://localhost:4000/artist
+http://localhost:4000/track
+http://localhost:4000/album
+http://localhost:4000/favs
+```
+Detailed description of expected behaviour can be found in [task assignment](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/rest-service/assignment.md).
 
 ## Testing
 
