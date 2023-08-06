@@ -16,7 +16,7 @@ async function bootstrap() {
   );
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('port');
+  const port = configService.get<number>('port') || 4000;
 
   const filePath = path.resolve(__dirname, 'doc', 'api.yaml');
   const document: any = yaml.load(fs.readFileSync(filePath, 'utf8'));
