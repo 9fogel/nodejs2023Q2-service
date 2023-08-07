@@ -5,6 +5,7 @@ services:
     restart: always
     volumes:
       - ./src:/app/src
+    command: npm run start:dev
     ports:
       - ${PORT}:${PORT}
     depends_on:
