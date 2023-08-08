@@ -2,6 +2,7 @@ version: '3'
 services:
   node:
     build: .
+    image: 9fogel/docker-hl-node
     restart: always
     volumes:
       - ./src:/app/src
@@ -18,6 +19,7 @@ services:
       - my-network
   postgres:
     build: ./src/database
+    image: 9fogel/hl-postgres
     restart: always
     volumes:
       - dbdata:/var/lib/postgresql/data
