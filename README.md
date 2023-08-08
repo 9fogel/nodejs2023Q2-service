@@ -6,21 +6,46 @@
 3. Switch to `develop` branch
 4. To install all dependencies use [`npm install`](https://docs.npmjs.com/cli/install)
 
-## Running application
+## Running application with Docker
+1. Install [Docker Desktop](https://docs.docker.com/engine/install/)
+2. Make sure Docker Desktop is opened and is running
+3. Run the following command in terminal
 
 ```
-npm start
+docker-compose up
 ```
+## Stopping application with Docker
+1. Run the following command in terminal
+
+```
+docker-compose down
+```
+## Vulnerabilities scanning with Docker
+1. Run the following command in terminal
+
+```
+npm run scan
+```
+
+## Problem solving with Docker
+1. In case of issues with Docker please clean docker cashe
+
+```
+docker builder prune
+
+OR
+
+docker system prune
+```
+##
 App served at http://localhost:4000
 
-Port value is stored in `.env` file
+Port value and variables are stored in `.env` file
 
 _After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/._
 
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
-
-**Please note:** The database already has some default values at start
 
 ## Endpoints
 The following endpoints are available:
