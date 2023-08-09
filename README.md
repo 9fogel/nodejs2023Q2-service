@@ -26,6 +26,7 @@ docker-compose down
 ```
 npm run scan
 ```
+**NB** This functionality require login into your DockerHub account, otherwise it will be suggested to login within terminal
 
 ## Problem solving with Docker
 1. In case of issues with Docker please clean docker cashe
