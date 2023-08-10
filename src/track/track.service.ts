@@ -5,29 +5,26 @@ import {
 } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { DatabaseService } from 'src/database/database.service';
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { validate as uuidValidate } from 'uuid';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TrackService {
-  constructor(private db: DatabaseService) {}
+  constructor(private prisma: PrismaService) {}
 
-  create(createTrackDto: CreateTrackDto) {
-    const newTrack = {
-      id: uuidv4(),
-      ...createTrackDto,
-    };
-
-    this.db.addElement('tracks', newTrack);
+  async create(data: CreateTrackDto) {
+    const newTrack = await this.prisma.track.create({
+      data,
+    });
 
     return newTrack;
   }
 
-  findAll() {
-    return this.db.findMany('tracks');
+  async findAll() {
+    return await this.prisma.track.findMany();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     const isIdValid = uuidValidate(id);
 
     if (!isIdValid) {
@@ -36,7 +33,11 @@ export class TrackService {
       );
     }
 
-    const foundTrack = this.db.findFirst('tracks', id);
+    const foundTrack = await this.prisma.track.findUnique({
+      where: {
+        id: id,
+      },
+    });
     if (foundTrack) {
       return foundTrack;
     } else {
@@ -44,7 +45,7 @@ export class TrackService {
     }
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
+  async update(id: string, updateTrackDto: UpdateTrackDto) {
     const isIdValid = uuidValidate(id);
 
     if (!isIdValid) {
@@ -53,7 +54,11 @@ export class TrackService {
       );
     }
 
-    const trackToUpdate = this.db.findFirst('tracks', id);
+    const trackToUpdate = await this.prisma.track.findUnique({
+      where: {
+        id: id,
+      },
+    });
     if (!trackToUpdate) {
       throw new NotFoundException(`Sorry, track with ID ${id} not found`);
     }
@@ -64,10 +69,15 @@ export class TrackService {
     trackToUpdate.albumId = albumId;
     trackToUpdate.duration = duration;
 
-    return trackToUpdate;
+    const updatedTrack = await this.prisma.track.update({
+      where: { id: id },
+      data: trackToUpdate,
+    });
+
+    return updatedTrack;
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     const isIdValid = uuidValidate(id);
 
     if (!isIdValid) {
@@ -76,9 +86,17 @@ export class TrackService {
       );
     }
 
-    const trackToDelete = this.db.findFirst('tracks', id);
+    const trackToDelete = await this.prisma.track.findUnique({
+      where: {
+        id: id,
+      },
+    });
     if (trackToDelete) {
-      this.db.deleteElement('tracks', trackToDelete);
+      await this.prisma.track.delete({
+        where: {
+          id: id,
+        },
+      });
       return `Track with ID #${id} was removed`;
     } else {
       throw new NotFoundException(`Sorry, track with ID ${id} not found`);
