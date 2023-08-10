@@ -20,6 +20,7 @@ services:
   postgres:
     build: ./src/database
     image: 9fogel/hl-postgres
+    container_name: postgres
     restart: always
     volumes:
       - dbdata:/var/lib/postgresql/data
