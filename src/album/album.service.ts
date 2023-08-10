@@ -1,11 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { validate as uuidValidate } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -25,14 +20,6 @@ export class AlbumService {
   }
 
   async findOne(id: string) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, album ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const foundAlbum = await this.prisma.album.findUnique({
       where: {
         id: id,
@@ -46,14 +33,6 @@ export class AlbumService {
   }
 
   async update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, album ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const albumToUpdate = await this.prisma.album.findUnique({
       where: {
         id: id,
@@ -77,14 +56,6 @@ export class AlbumService {
   }
 
   async remove(id: string) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, album ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const albumToDelete = await this.prisma.album.findUnique({
       where: {
         id: id,

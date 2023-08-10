@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -7,7 +6,6 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IUser } from 'src/models/interfaces';
-import { validate as uuidValidate } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -31,14 +29,6 @@ export class UserService {
   }
 
   async findOne(id: string) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, user ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const foundUser = await this.prisma.user.findUnique({
       where: {
         id: id,
@@ -52,14 +42,6 @@ export class UserService {
   }
 
   async updatePassword(id: string, updateUserDto: UpdateUserDto) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, user ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const userToUpdate = await this.prisma.user.findUnique({
       where: {
         id: id,
@@ -89,14 +71,6 @@ export class UserService {
   }
 
   async remove(id: string) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, user ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const userToDelete = await this.prisma.user.findUnique({
       where: {
         id: id,

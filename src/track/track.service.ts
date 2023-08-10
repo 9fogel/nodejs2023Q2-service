@@ -1,11 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { validate as uuidValidate } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -25,14 +20,6 @@ export class TrackService {
   }
 
   async findOne(id: string) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, track ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const foundTrack = await this.prisma.track.findUnique({
       where: {
         id: id,
@@ -46,14 +33,6 @@ export class TrackService {
   }
 
   async update(id: string, updateTrackDto: UpdateTrackDto) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, track ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const trackToUpdate = await this.prisma.track.findUnique({
       where: {
         id: id,
@@ -78,14 +57,6 @@ export class TrackService {
   }
 
   async remove(id: string) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, track ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const trackToDelete = await this.prisma.track.findUnique({
       where: {
         id: id,

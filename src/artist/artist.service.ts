@@ -1,11 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { validate as uuidValidate } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -25,14 +20,6 @@ export class ArtistService {
   }
 
   async findOne(id: string) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, artist ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const foundArtist = await this.prisma.artist.findUnique({
       where: {
         id: id,
@@ -46,14 +33,6 @@ export class ArtistService {
   }
 
   async update(id: string, updateArtistDto: UpdateArtistDto) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, artist ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const artistToUpdate = await this.prisma.artist.findUnique({
       where: {
         id: id,
@@ -76,14 +55,6 @@ export class ArtistService {
   }
 
   async remove(id: string) {
-    const isIdValid = uuidValidate(id);
-
-    if (!isIdValid) {
-      throw new BadRequestException(
-        `Sorry, artist ID ${id} is invalid (not uuid)`,
-      );
-    }
-
     const artistToDelete = await this.prisma.artist.findUnique({
       where: {
         id: id,
