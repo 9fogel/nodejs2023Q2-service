@@ -6,37 +6,31 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { DatabaseService } from 'src/database/database.service';
 import { IUser } from 'src/models/interfaces';
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { validate as uuidValidate } from 'uuid';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor(private db: DatabaseService) {}
+  constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
-    const newUser = {
-      id: uuidv4(),
-      ...createUserDto,
-      version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
+  async create(data: CreateUserDto) {
+    const newUser = await this.prisma.user.create({
+      data,
+    });
 
-    this.db.addElement('users', newUser);
-
-    const newUserResponse = this.hidePasswordUser(newUser);
+    const newUserResponse = this.responseUser(newUser);
 
     return newUserResponse;
   }
 
-  findAll() {
-    return this.db
-      .findMany('users')
-      .map((user: IUser) => this.hidePasswordUser(user));
+  async findAll() {
+    return (await this.prisma.user.findMany()).map((user: IUser) =>
+      this.responseUser(user),
+    );
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     const isIdValid = uuidValidate(id);
 
     if (!isIdValid) {
@@ -45,15 +39,19 @@ export class UserService {
       );
     }
 
-    const foundUser = this.db.findFirst('users', id);
+    const foundUser = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
     if (foundUser) {
-      return this.hidePasswordUser(foundUser);
+      return this.responseUser(foundUser);
     } else {
       throw new NotFoundException(`Sorry, user with ID ${id} not found`);
     }
   }
 
-  updatePassword(id: string, updateUserDto: UpdateUserDto) {
+  async updatePassword(id: string, updateUserDto: UpdateUserDto) {
     const isIdValid = uuidValidate(id);
 
     if (!isIdValid) {
@@ -62,7 +60,11 @@ export class UserService {
       );
     }
 
-    const userToUpdate = this.db.findFirst('users', id);
+    const userToUpdate = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
     if (!userToUpdate) {
       throw new NotFoundException(`Sorry, user with ID ${id} not found`);
     }
@@ -72,15 +74,21 @@ export class UserService {
     if (oldPassword === userToUpdate.password) {
       userToUpdate.password = newPassword;
       userToUpdate.version += 1;
-      userToUpdate.updatedAt = Date.now();
+      userToUpdate.createdAt = userToUpdate.createdAt;
+      userToUpdate.updatedAt = new Date(Date.now());
     } else {
       throw new ForbiddenException(`Old password is incorrect`);
     }
 
-    return this.hidePasswordUser(userToUpdate);
+    const updatedUser = await this.prisma.user.update({
+      where: { id: id },
+      data: userToUpdate,
+    });
+
+    return this.responseUser(updatedUser);
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     const isIdValid = uuidValidate(id);
 
     if (!isIdValid) {
@@ -89,22 +97,31 @@ export class UserService {
       );
     }
 
-    const userToDelete = this.db.findFirst('users', id);
+    const userToDelete = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
     if (userToDelete) {
-      this.db.deleteElement('users', userToDelete);
+      await this.prisma.user.delete({
+        where: {
+          id: id,
+        },
+      });
       return `User with ID #${id} was removed`;
     } else {
       throw new NotFoundException(`Sorry, user with ID ${id} not found`);
     }
   }
 
-  hidePasswordUser(user: IUser) {
+  responseUser(user: IUser) {
     const userResponse = {
       id: user.id,
       login: user.login,
       version: user.version,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+      createdAt: (user.createdAt as Date).getTime(),
+      updatedAt: (user.updatedAt as Date).getTime(),
     };
 
     return userResponse;
