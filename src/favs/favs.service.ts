@@ -4,31 +4,14 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-// import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class FavsService {
-  // constructor(private db: DatabaseService) {}
   constructor(private prisma: PrismaService) {}
 
-  // async create(entity: string, id: string) {
-  //   const favDbKey = 'fav' + entity[0].toUpperCase() + entity.slice(1);
-  //   const idKey = `${entity}Id`;
-  //   if (this.existsInDatabase(entity, id)) {
-  //     return await this.prisma[favDbKey].create({
-  //       data: { [idKey]: id },
-  //     });
-  //   } else {
-  //     throw new UnprocessableEntityException(
-  //       `Sorry, ${entity} with ID ${id} doesn't exist in Database`,
-  //     );
-  //   }
-  // }
-
   async create(entity: string, id: string) {
-    // const favDbKey = 'fav' + entity[0].toUpperCase() + entity.slice(1);
-    // const idKey = `${entity}Id`;
-    if (this.existsInDatabase(entity, id)) {
+    if (await this.existsInDatabase(entity, id)) {
+      console.log('CONSOLE add ', entity, id);
       switch (entity) {
         case 'album':
           await this.addAlbum(id);
@@ -40,10 +23,8 @@ export class FavsService {
           await this.addTrack(id);
           break;
       }
-      // return await this.prisma[favDbKey].create({
-      //   data: { [idKey]: id },
-      // });
     } else {
+      console.log('DOENST EXIST');
       throw new UnprocessableEntityException(
         `Sorry, ${entity} with ID ${id} doesn't exist in Database`,
       );
@@ -51,64 +32,36 @@ export class FavsService {
   }
 
   async findAll() {
-    const favArtistsIds = (await this.prisma.favArtist.findMany()).map(
-      (item) => item.artistId,
-    );
-    const favTracksIds = (await this.prisma.favTrack.findMany()).map(
-      (item) => item.trackId,
-    );
-    const favAlbumsIds = (await this.prisma.favAlbum.findMany()).map(
-      (item) => item.albumId,
-    );
+    const favAlbums = await this.prisma.favAlbum.findMany({
+      include: {
+        album: true,
+      },
+    });
 
-    // const [favArtists, favTracks, favAlbums] = await Promise.all([
-    //   this.mapIdToItem('artist', favArtistsIds),
-    //   this.mapIdToItem('track', favTracksIds),
-    //   this.mapIdToItem('album', favAlbumsIds),
-    // ]);
+    const favArtists = await this.prisma.favArtist.findMany({
+      include: {
+        artist: true,
+      },
+    });
 
-    // const artists = favArtists.map((artist) => artist);
-
-    console.log('CONSOLE favs get all');
-    // console.log(favArtists);
-    // console.log(favTracks);
-    // console.log(favAlbums);
-
-    const favArtists = (await this.mapIdToItem('artist', favArtistsIds)).map(
-      (item) =>
-        item.then((value) => {
-          // console.log(value);
-          return value;
-        }),
-    );
-    const favTracks = await this.mapIdToItem('track', favTracksIds);
-    const favAlbums = await this.mapIdToItem('album', favAlbumsIds);
-
-    console.log(favArtists);
+    const favTracks = await this.prisma.favTrack.findMany({
+      include: {
+        track: true,
+      },
+    });
 
     const result = {
-      artists: favArtists,
-      albums: [...favAlbums],
-      tracks: [...favTracks],
+      artists: favArtists.map((item) => item.artist),
+      albums: favAlbums.map((item) => item.album),
+      tracks: favTracks.map((item) => item.track),
     };
-    // console.log(result);
+
     return result;
-    // return {
-    //   artists: [...favArtists],
-    //   albums: [...favAlbums],
-    //   tracks: [...favTracks],
-    // };
   }
 
   async remove(entity: string, id: string) {
-    // const favKey = 'fav' + entity[0].toUpperCase() + entity.slice(1);
-
-    if (this.existsInFavorites(entity, id)) {
-      // return await this.prisma[favKey].delete({
-      //   where: {
-      //     artist: id,
-      //   },
-      // });
+    if (await this.existsInFavorites(entity, id)) {
+      console.log('CONSOLE remove ', entity, id);
       switch (entity) {
         case 'album':
           await this.removeAlbum(id);
@@ -121,6 +74,7 @@ export class FavsService {
           break;
       }
     } else {
+      console.log('CONSOLE nor found in FAVS');
       throw new NotFoundException(
         `Sorry, ${entity} with ID ${id} not found in Favorites`,
       );
@@ -162,11 +116,6 @@ export class FavsService {
   }
 
   private async existsInFavorites(entity: string, id: string) {
-    // const doesExist = await this.prisma[favKey].findUnique({
-    //   where: {
-    //     artistId: id,
-    //   },
-    // });
     let doesExist;
     switch (entity) {
       case 'album':
@@ -195,18 +144,6 @@ export class FavsService {
     return doesExist ? true : false;
   }
 
-  private async mapIdToItem(entity: string, idList: Array<string>) {
-    const result = idList.map(async (artistId: string) => {
-      return await this.prisma[entity].findUnique({
-        where: {
-          id: artistId,
-        },
-      });
-    });
-
-    return result;
-  }
-
   private async removeAlbum(id: string) {
     await this.prisma.favAlbum.delete({
       where: {
@@ -230,47 +167,4 @@ export class FavsService {
       },
     });
   }
-
-  // create(entity: string, id: string) {
-  //   const isIdValid = uuidValidate(id);
-
-  //   if (!isIdValid) {
-  //     throw new BadRequestException(
-  //       `Sorry, ${entity} ID ${id} is invalid (not uuid)`,
-  //     );
-  //   }
-
-  //   const key = entity + 's';
-  //   if (this.db.existsInDatabase(key, id)) {
-  //     return this.db.addToFavs(key, id);
-  //   } else {
-  //     throw new UnprocessableEntityException(
-  //       `Sorry, ${entity} with ID ${id} doesn't exist in Database`,
-  //     );
-  //   }
-  // }
-
-  // findAll() {
-  //   return this.db.findMany('favs');
-  // }
-
-  // remove(entity: string, id: string) {
-  //   const isIdValid = uuidValidate(id);
-
-  //   if (!isIdValid) {
-  //     throw new BadRequestException(
-  //       `Sorry, ${entity} ID ${id} is invalid (not uuid)`,
-  //     );
-  //   }
-
-  //   const key = entity + 's';
-  //   if (this.db.existsInFavorites(key, id)) {
-  //     this.db.removeFromFavs(key, id);
-  //     return `${key.toUpperCase()} with ID ${id} was removed from Favorites`;
-  //   } else {
-  //     throw new NotFoundException(
-  //       `Sorry, ${entity} with ID ${id} not found in Favorites`,
-  //     );
-  //   }
-  // }
 }

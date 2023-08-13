@@ -18,9 +18,13 @@ export class FavsController {
     @Param('entity') entity: string,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    await this.favsService.create(entity, id);
-    return `${entity.toUpperCase()} with ID ${id} was added to favorites`;
-    // return { id };
+    try {
+      await this.favsService.create(entity, id);
+      return `${entity.toUpperCase()} with ID ${id} was added to favorites`;
+      // return { id };
+    } catch (err) {
+      console.log(err.toString());
+    }
   }
 
   @Get()
@@ -34,6 +38,10 @@ export class FavsController {
     @Param('entity') entity: string,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    return await this.favsService.remove(entity, id);
+    try {
+      return await this.favsService.remove(entity, id);
+    } catch (err) {
+      return err;
+    }
   }
 }
