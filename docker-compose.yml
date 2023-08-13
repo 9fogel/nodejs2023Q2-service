@@ -2,7 +2,11 @@ version: '3'
 services:
   node:
     build: .
+    image: 9fogel/docker-hl-node
     restart: always
+    volumes:
+      - ./src:/app/src
+    command: npm run start:dev
     ports:
       - ${PORT}:${PORT}
     depends_on:
@@ -15,10 +19,16 @@ services:
       - my-network
   postgres:
     build: ./src/database
+    image: 9fogel/hl-postgres
+    container_name: postgres
     restart: always
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - logsdata:/var/log/postgresql
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
+      PGDATA: ${PGDATA}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
@@ -30,3 +40,6 @@ services:
 networks:
   my-network:
     driver: bridge
+volumes:
+  logsdata:
+  dbdata:
