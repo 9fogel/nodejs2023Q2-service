@@ -19,17 +19,20 @@ export class FavsController {
     @Param('id', ParseUUIDPipe) id: string,
   ) {
     try {
-      await this.favsService.create(entity, id);
-      return `${entity.toUpperCase()} with ID ${id} was added to favorites`;
-      // return { id };
+      return await this.favsService.create(entity, id);
     } catch (err) {
       console.log(err.toString());
+      return err;
     }
   }
 
   @Get()
   async findAll() {
-    return await this.favsService.findAll();
+    try {
+      return await this.favsService.findAll();
+    } catch (err) {
+      console.log(err.toString());
+    }
   }
 
   @Delete(':entity/:id')
@@ -41,7 +44,7 @@ export class FavsController {
     try {
       return await this.favsService.remove(entity, id);
     } catch (err) {
-      return err;
+      console.log(err.toString());
     }
   }
 }

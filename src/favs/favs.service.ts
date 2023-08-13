@@ -3,6 +3,7 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -10,24 +11,53 @@ export class FavsService {
   constructor(private prisma: PrismaService) {}
 
   async create(entity: string, id: string) {
-    if (await this.existsInDatabase(entity, id)) {
-      console.log('CONSOLE add ', entity, id);
-      switch (entity) {
-        case 'album':
+    // try {
+    switch (entity) {
+      case 'album':
+        try {
           await this.addAlbum(id);
-          break;
-        case 'artist':
+        } catch (err) {
+          this.handleError(err, entity, id);
+        }
+        break;
+      case 'artist':
+        try {
           await this.addArtist(id);
-          break;
-        case 'track':
+        } catch (err) {
+          this.handleError(err, entity, id);
+        }
+        break;
+      case 'track':
+        try {
           await this.addTrack(id);
-          break;
+        } catch (err) {
+          this.handleError(err, entity, id);
+        }
+        break;
+    }
+    return `${entity.toUpperCase()} with ID ${id} was added to favorites`;
+    // } catch (err) {
+    //   this.handleError(err, entity, id);
+    // }
+  }
+
+  handleError(err: Error, entity: string, id: string) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      switch (err.code) {
+        case 'P2002':
+          console.log('CONSOLE P2002');
+          throw new UnprocessableEntityException(
+            `Sorry, ${entity} with ID ${id} already exists in Favorites`,
+          );
+        case 'P2003':
+          console.log('CONSOLE P2003');
+          throw new UnprocessableEntityException(
+            `Sorry, ${entity} with ID ${id} doesn't exist in Database`,
+          );
       }
     } else {
-      console.log('DOENST EXIST');
-      throw new UnprocessableEntityException(
-        `Sorry, ${entity} with ID ${id} doesn't exist in Database`,
-      );
+      throw err;
+      // console.log(err.toString());
     }
   }
 
@@ -61,20 +91,15 @@ export class FavsService {
 
   async remove(entity: string, id: string) {
     if (await this.existsInFavorites(entity, id)) {
-      console.log('CONSOLE remove ', entity, id);
       switch (entity) {
         case 'album':
-          await this.removeAlbum(id);
-          break;
+          return await this.removeAlbum(id);
         case 'artist':
-          await this.removeArtist(id);
-          break;
+          return await this.removeArtist(id);
         case 'track':
-          await this.removeTrack(id);
-          break;
+          return await this.removeTrack(id);
       }
     } else {
-      console.log('CONSOLE nor found in FAVS');
       throw new NotFoundException(
         `Sorry, ${entity} with ID ${id} not found in Favorites`,
       );
@@ -82,7 +107,7 @@ export class FavsService {
   }
 
   private async addAlbum(id: string) {
-    await this.prisma.favAlbum.create({
+    return await this.prisma.favAlbum.create({
       data: {
         albumId: id,
       },
@@ -90,7 +115,7 @@ export class FavsService {
   }
 
   private async addArtist(id: string) {
-    await this.prisma.favArtist.create({
+    return await this.prisma.favArtist.create({
       data: {
         artistId: id,
       },
@@ -98,22 +123,22 @@ export class FavsService {
   }
 
   private async addTrack(id: string) {
-    await this.prisma.favTrack.create({
+    return await this.prisma.favTrack.create({
       data: {
         trackId: id,
       },
     });
   }
 
-  private async existsInDatabase(entity: string, id: string) {
-    const doesExist = await this.prisma[entity].findUnique({
-      where: {
-        id: id,
-      },
-    });
+  // private async existsInDatabase(entity: string, id: string) {
+  //   const doesExist = await this.prisma[entity].findUnique({
+  //     where: {
+  //       id: id,
+  //     },
+  //   });
 
-    return doesExist ? true : false;
-  }
+  //   return doesExist ? true : false;
+  // }
 
   private async existsInFavorites(entity: string, id: string) {
     let doesExist;
@@ -145,7 +170,7 @@ export class FavsService {
   }
 
   private async removeAlbum(id: string) {
-    await this.prisma.favAlbum.delete({
+    return await this.prisma.favAlbum.delete({
       where: {
         albumId: id,
       },
@@ -153,7 +178,7 @@ export class FavsService {
   }
 
   private async removeArtist(id: string) {
-    await this.prisma.favArtist.delete({
+    return await this.prisma.favArtist.delete({
       where: {
         artistId: id,
       },
@@ -161,7 +186,7 @@ export class FavsService {
   }
 
   private async removeTrack(id: string) {
-    await this.prisma.favTrack.delete({
+    return await this.prisma.favTrack.delete({
       where: {
         trackId: id,
       },
