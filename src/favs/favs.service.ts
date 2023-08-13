@@ -11,7 +11,6 @@ export class FavsService {
   constructor(private prisma: PrismaService) {}
 
   async create(entity: string, id: string) {
-    // try {
     switch (entity) {
       case 'album':
         try {
@@ -36,29 +35,6 @@ export class FavsService {
         break;
     }
     return `${entity.toUpperCase()} with ID ${id} was added to favorites`;
-    // } catch (err) {
-    //   this.handleError(err, entity, id);
-    // }
-  }
-
-  handleError(err: Error, entity: string, id: string) {
-    if (err instanceof PrismaClientKnownRequestError) {
-      switch (err.code) {
-        case 'P2002':
-          console.log('CONSOLE P2002');
-          throw new UnprocessableEntityException(
-            `Sorry, ${entity} with ID ${id} already exists in Favorites`,
-          );
-        case 'P2003':
-          console.log('CONSOLE P2003');
-          throw new UnprocessableEntityException(
-            `Sorry, ${entity} with ID ${id} doesn't exist in Database`,
-          );
-      }
-    } else {
-      throw err;
-      // console.log(err.toString());
-    }
   }
 
   async findAll() {
@@ -130,15 +106,23 @@ export class FavsService {
     });
   }
 
-  // private async existsInDatabase(entity: string, id: string) {
-  //   const doesExist = await this.prisma[entity].findUnique({
-  //     where: {
-  //       id: id,
-  //     },
-  //   });
-
-  //   return doesExist ? true : false;
-  // }
+  private handleError(err: Error, entity: string, id: string) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      switch (err.code) {
+        case 'P2002':
+          throw new UnprocessableEntityException(
+            `Sorry, ${entity} with ID ${id} already exists in Favorites`,
+          );
+        case 'P2003':
+          throw new UnprocessableEntityException(
+            `Sorry, ${entity} with ID ${id} doesn't exist in Database`,
+          );
+      }
+    } else {
+      throw err;
+      // console.log(err.toString());
+    }
+  }
 
   private async existsInFavorites(entity: string, id: string) {
     let doesExist;

@@ -18,21 +18,12 @@ export class FavsController {
     @Param('entity') entity: string,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    try {
-      return await this.favsService.create(entity, id);
-    } catch (err) {
-      console.log(err.toString());
-      return err;
-    }
+    return await this.favsService.create(entity, id);
   }
 
   @Get()
   async findAll() {
-    try {
-      return await this.favsService.findAll();
-    } catch (err) {
-      console.log(err.toString());
-    }
+    return await this.favsService.findAll();
   }
 
   @Delete(':entity/:id')
@@ -41,10 +32,6 @@ export class FavsController {
     @Param('entity') entity: string,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    try {
-      return await this.favsService.remove(entity, id);
-    } catch (err) {
-      console.log(err.toString());
-    }
+    return await this.favsService.remove(entity, id);
   }
 }
