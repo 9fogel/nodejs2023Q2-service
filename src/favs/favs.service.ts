@@ -120,7 +120,6 @@ export class FavsService {
       }
     } else {
       throw err;
-      // console.log(err.toString());
     }
   }
 
