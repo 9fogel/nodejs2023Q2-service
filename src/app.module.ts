@@ -8,16 +8,18 @@ import { AlbumModule } from './album/album.module';
 import { FavsModule } from './favs/favs.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ envFilePath: '.env' }),
     UserModule,
     ArtistModule,
     TrackModule,
     AlbumModule,
     FavsModule,
     DatabaseModule,
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

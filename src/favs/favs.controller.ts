@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Param, Delete, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Delete,
+  HttpCode,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { FavsService } from './favs.service';
 
 @Controller('favs')
@@ -6,20 +14,24 @@ export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 
   @Post(':entity/:id')
-  create(@Param('entity') entity: string, @Param('id') id: string) {
-    this.favsService.create(entity, id);
-    return `${entity.toUpperCase()} with ID ${id} was added to favorites`;
-    // return { id };
+  async create(
+    @Param('entity') entity: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return await this.favsService.create(entity, id);
   }
 
   @Get()
-  findAll() {
-    return this.favsService.findAll();
+  async findAll() {
+    return await this.favsService.findAll();
   }
 
   @Delete(':entity/:id')
   @HttpCode(204)
-  remove(@Param('entity') entity: string, @Param('id') id: string) {
-    return this.favsService.remove(entity, id);
+  async remove(
+    @Param('entity') entity: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return await this.favsService.remove(entity, id);
   }
 }
