@@ -13,6 +13,7 @@ services:
       - postgres
     environment:
       - PORT=${PORT}
+      - DATABASE_URL=${DATABASE_URL_CONTAINER}
     env_file:
       .env
     networks:

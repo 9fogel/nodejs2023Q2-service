@@ -21,12 +21,12 @@ docker-compose up
 docker-compose down
 ```
 ## Vulnerabilities scanning with Docker
-1. Run the following command in terminal
+1. Run the following command in terminal (works both with running and stopped container)
 
 ```
 npm run scan
 ```
-**NB** This functionality require login into your DockerHub account, otherwise it will be suggested to login within terminal
+**NB:** This functionality require login into your DockerHub account, otherwise it will be suggested to login within terminal
 
 ## Problem solving with Docker
 1. In case of issues with Docker please clean docker cashe
@@ -63,25 +63,25 @@ Detailed description of expected behaviour can be found in [task assignment](htt
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
+To run all tests without authorization (docker container must be running with `docker-compose up` command)
 
 ```
 npm run test
 ```
 
-To run only one of all test suites
+To run only one of all test suites (docker container must be running with `docker-compose up` command)
 
 ```
 npm run test -- <path to suite>
 ```
 
-To run all test with authorization
+To run all test with authorization - NOT NEEDED FOR THIS TASK
 
 ```
 npm run test:auth
 ```
 
-To run only specific test suite with authorization
+To run only specific test suite with authorization - NOT NEEDED FOR THIS TASK
 
 ```
 npm run test:auth -- <path to suite>
