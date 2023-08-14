@@ -63,13 +63,13 @@ Detailed description of expected behaviour can be found in [task assignment](htt
 
 After application running open new terminal and enter:
 
-To run all tests without authorization (docker container must be running)
+To run all tests without authorization (docker container must be running with `docker-compose up` command)
 
 ```
 npm run test
 ```
 
-To run only one of all test suites (docker container must be running)
+To run only one of all test suites (docker container must be running with `docker-compose up` command)
 
 ```
 npm run test -- <path to suite>
