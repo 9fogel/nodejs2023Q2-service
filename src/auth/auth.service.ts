@@ -10,9 +10,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  signup(loginDto: LoginDto) {
-    console.log(loginDto);
-    return 'This is signup';
+  async signup(loginDto: LoginDto) {
+    const user = await this.userService.create(loginDto);
+    return user;
   }
 
   async login(loginDto: LoginDto) {
