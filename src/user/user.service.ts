@@ -41,6 +41,19 @@ export class UserService {
     }
   }
 
+  async findOneByLogin(login: string) {
+    const foundUser = await this.prisma.user.findFirst({
+      where: {
+        login: login,
+      },
+    });
+    if (foundUser) {
+      return foundUser;
+    } else {
+      throw new NotFoundException(`Sorry, user with login ${login} not found`);
+    }
+  }
+
   async updatePassword(id: string, updateUserDto: UpdateUserDto) {
     const userToUpdate = await this.prisma.user.findUnique({
       where: {

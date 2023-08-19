@@ -1,15 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { LoginDto } from './dto/login.dto';
+import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  signup(createAuthDto: CreateAuthDto) {
-    console.log(createAuthDto);
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
+
+  signup(loginDto: LoginDto) {
+    console.log(loginDto);
     return 'This is signup';
   }
 
-  login(createAuthDto: CreateAuthDto) {
-    console.log(createAuthDto);
-    return 'This is login';
+  async login(loginDto: LoginDto) {
+    const { login, password: enteredPassword } = loginDto;
+    console.log(login, enteredPassword);
+
+    const user = await this.userService.findOneByLogin(login);
+    if (user.password !== enteredPassword) {
+      throw new UnauthorizedException();
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...responseUser } = user;
+    //TODO: generate JWT, and then return it
+    return responseUser;
   }
 }
