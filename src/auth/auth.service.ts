@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -20,9 +21,16 @@ export class AuthService {
     console.log(login, enteredPassword);
 
     const user = await this.userService.findOneByLogin(login);
-    if (user.password !== enteredPassword) {
+    const passwordMatches = await bcrypt.compare(
+      enteredPassword,
+      user.password,
+    );
+    if (!passwordMatches) {
       throw new UnauthorizedException();
     }
+    // if (user.password !== enteredPassword) {
+    //   throw new UnauthorizedException();
+    // }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     // const { password, ...responseUser } = user;
