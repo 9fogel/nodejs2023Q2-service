@@ -20,12 +20,10 @@ export class UserService {
       ...data,
       password: hash,
     };
+
     const newUser = await this.prisma.user.create({
       data: userData,
     });
-    // const newUser = await this.prisma.user.create({
-    //   data,
-    // });
 
     const newUserResponse = this.responseUser(newUser);
 
@@ -60,7 +58,7 @@ export class UserService {
     if (foundUser) {
       return foundUser;
     } else {
-      throw new NotFoundException(`Sorry, user with login ${login} not found`);
+      throw new ForbiddenException(`Sorry, user with login ${login} not found`);
     }
   }
 
@@ -75,9 +73,15 @@ export class UserService {
     }
 
     const { oldPassword, newPassword } = updateUserDto;
+    const passwordMatches = await bcrypt.compare(
+      oldPassword,
+      userToUpdate.password,
+    );
 
-    if (oldPassword === userToUpdate.password) {
-      userToUpdate.password = newPassword;
+    if (passwordMatches) {
+      const cryptSalt = 10; //TODO: change to value from .env
+      const hash = await bcrypt.hash(newPassword, cryptSalt);
+      userToUpdate.password = hash;
       userToUpdate.version += 1;
       userToUpdate.createdAt = userToUpdate.createdAt;
       userToUpdate.updatedAt = new Date(Date.now());
