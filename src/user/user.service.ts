@@ -11,11 +11,14 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  cryptSalt: number;
+
+  constructor(private prisma: PrismaService) {
+    this.cryptSalt = +process.env.CRYPT_SALT || 10;
+  }
 
   async create(data: CreateUserDto) {
-    const cryptSalt = 10; //TODO: change to value from .env
-    const hash = await bcrypt.hash(data.password, cryptSalt);
+    const hash = await bcrypt.hash(data.password, this.cryptSalt);
     const userData = {
       ...data,
       password: hash,
@@ -79,8 +82,7 @@ export class UserService {
     );
 
     if (passwordMatches) {
-      const cryptSalt = 10; //TODO: change to value from .env
-      const hash = await bcrypt.hash(newPassword, cryptSalt);
+      const hash = await bcrypt.hash(newPassword, this.cryptSalt);
       userToUpdate.password = hash;
       userToUpdate.version += 1;
       userToUpdate.createdAt = userToUpdate.createdAt;
