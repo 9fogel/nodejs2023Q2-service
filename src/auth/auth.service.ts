@@ -25,8 +25,13 @@ export class AuthService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...responseUser } = user;
+    // const { password, ...responseUser } = user;
     //TODO: generate JWT, and then return it
-    return responseUser;
+    // return responseUser;
+
+    const payload = { sub: user.id, username: user.login };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }
