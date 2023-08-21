@@ -56,6 +56,8 @@ http://localhost:4000/artist
 http://localhost:4000/track
 http://localhost:4000/album
 http://localhost:4000/favs
+http://localhost:4000/auth/signup
+http://localhost:4000/auth/login
 ```
 Detailed description of expected behaviour can be found in [task assignment](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/rest-service/assignment.md).
 
@@ -63,25 +65,25 @@ Detailed description of expected behaviour can be found in [task assignment](htt
 
 After application running open new terminal and enter:
 
-To run all tests without authorization (docker container must be running with `docker-compose up` command)
+To run all tests without authorization (docker container must be running with `docker-compose up` command)  - NOT NEEDED FOR 3rd PART OF THE TASK
 
 ```
 npm run test
 ```
 
-To run only one of all test suites (docker container must be running with `docker-compose up` command)
+To run only one of all test suites (docker container must be running with `docker-compose up` command) - NOT NEEDED FOR 3rd PART OF THE TASK
 
 ```
 npm run test -- <path to suite>
 ```
 
-To run all test with authorization - NOT NEEDED FOR THIS TASK
+To run all test with authorization
 
 ```
 npm run test:auth
 ```
 
-To run only specific test suite with authorization - NOT NEEDED FOR THIS TASK
+To run only specific test suite with authorization
 
 ```
 npm run test:auth -- <path to suite>

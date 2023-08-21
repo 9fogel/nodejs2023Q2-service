@@ -9,10 +9,12 @@ import { FavsModule } from './favs/favs.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: '.env' }),
+    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     UserModule,
     ArtistModule,
     TrackModule,
@@ -20,6 +22,8 @@ import { PrismaModule } from './prisma/prisma.module';
     FavsModule,
     DatabaseModule,
     PrismaModule,
+    AuthModule,
+    LoggingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

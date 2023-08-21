@@ -7,14 +7,25 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IUser } from 'src/models/interfaces';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  cryptSalt: number;
+
+  constructor(private prisma: PrismaService) {
+    this.cryptSalt = +process.env.CRYPT_SALT || 10;
+  }
 
   async create(data: CreateUserDto) {
+    const hash = await bcrypt.hash(data.password, this.cryptSalt);
+    const userData = {
+      ...data,
+      password: hash,
+    };
+
     const newUser = await this.prisma.user.create({
-      data,
+      data: userData,
     });
 
     const newUserResponse = this.responseUser(newUser);
@@ -41,6 +52,19 @@ export class UserService {
     }
   }
 
+  async findOneByLogin(login: string) {
+    const foundUser = await this.prisma.user.findFirst({
+      where: {
+        login: login,
+      },
+    });
+    if (foundUser) {
+      return foundUser;
+    } else {
+      throw new ForbiddenException(`Sorry, user with login ${login} not found`);
+    }
+  }
+
   async updatePassword(id: string, updateUserDto: UpdateUserDto) {
     const userToUpdate = await this.prisma.user.findUnique({
       where: {
@@ -52,9 +76,14 @@ export class UserService {
     }
 
     const { oldPassword, newPassword } = updateUserDto;
+    const passwordMatches = await bcrypt.compare(
+      oldPassword,
+      userToUpdate.password,
+    );
 
-    if (oldPassword === userToUpdate.password) {
-      userToUpdate.password = newPassword;
+    if (passwordMatches) {
+      const hash = await bcrypt.hash(newPassword, this.cryptSalt);
+      userToUpdate.password = hash;
       userToUpdate.version += 1;
       userToUpdate.createdAt = userToUpdate.createdAt;
       userToUpdate.updatedAt = new Date(Date.now());
