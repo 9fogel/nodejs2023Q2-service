@@ -8,14 +8,17 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { LoggingService } from './logging/logging.service';
 import { LoggingInterceptor } from './logging/logging.interceptor';
+import { CustomExceptionFilter } from './logging/exception/exception.filter';
 
 async function bootstrap() {
+  const logger = new LoggingService();
   const app = await NestFactory.create(AppModule, {
-    // logger: console,
-    logger: new LoggingService(),
+    logger,
   });
 
   app.useGlobalInterceptors(new LoggingInterceptor());
+
+  app.useGlobalFilters(new CustomExceptionFilter(logger));
 
   app.useGlobalPipes(
     new ValidationPipe({
