@@ -10,6 +10,7 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule,
     PrismaModule,
     AuthModule,
+    LoggingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -6,9 +6,14 @@ import { SwaggerModule } from '@nestjs/swagger';
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 import * as path from 'path';
+import { LoggingService } from './logging/logging.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    // logger: console,
+    logger: new LoggingService(),
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, //removes extra fields from body request
