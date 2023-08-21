@@ -7,12 +7,8 @@ export class LoggingService implements LoggerService {
   }
 
   error(message: any, ...optionalParams: any[]) {
-    console.error('\x1b[31mERROR %s\x1b[0m', optionalParams, message);
+    console.error('\x1b[31mERROR %s\x1b[0m', optionalParams.join(' '), message);
   }
-
-  // error(message: any) {
-  //   console.error('\x1b[31mERROR %s\x1b[0m', message);
-  // }
 
   warn(message: any, ...optionalParams: any[]) {
     console.warn('\x1b[33mWARN %s\x1b[0m', optionalParams, message);
